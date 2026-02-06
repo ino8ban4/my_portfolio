@@ -1,0 +1,27 @@
+services:
+  # 開発環境
+  dev:
+    image: node:20-alpine
+    container_name: express-api-dev
+    volumes:
+      - .:/app
+      - /app/node_modules  # node_modulesはコンテナ内で管理
+    working_dir: /app
+    command: sh -c "npm install && npm run dev"
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+
+  # 本番環境（後で使う）
+  prod:
+    build: .
+    container_name: express-api-prod
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    profiles:
+      - production

@@ -1,0 +1,13 @@
+{
+  "name": "docker-express-api",
+  "version": "1.0.0",
+  "description": "Simple Express API for Platform Engineering learning",
+  "main": "app.js",
+  "scripts": {
+    "dev": "node --watch app.js",
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
