@@ -5,7 +5,7 @@ services:
     container_name: express-api-dev
     volumes:
       - .:/app
-      - /app/node_modules  # node_modulesはコンテナ内で管理
+      - /app/node_modules
     working_dir: /app
     command: sh -c "npm install && npm run dev"
     ports:
@@ -13,8 +13,11 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=3000
+      - DATABASE_URL=postgresql://postgres:password@db:5432/devdb
+    depends_on:
+      - db
 
-  # 本番環境（後で使う）
+  # 本番環境
   prod:
     build: .
     container_name: express-api-prod
@@ -23,5 +26,24 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
+      - DATABASE_URL=postgresql://postgres:password@db:5432/proddb
+    depends_on:
+      - db
     profiles:
       - production
+
+  # PostgreSQL
+  db:
+    image: postgres:16-alpine
+    container_name: express-api-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=devdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
