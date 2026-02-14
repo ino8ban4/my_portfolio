@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: express-api
+  labels:
+    app: express-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: express-api
+  template:
+    metadata:
+      labels:
+        app: express-api
+    spec:
+      containers:
+      - name: express
+        image: express-api:v1
+        imagePullPolicy: Never  # ローカルイメージ使用（重要！）
+        ports:
+        - containerPort: 3000
+        env:
+        - name: PORT
+          value: "3000"
+        - name: NODE_ENV
+          value: "production"
