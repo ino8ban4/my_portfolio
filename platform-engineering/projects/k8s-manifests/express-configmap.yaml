@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: express-config
+data:
+  # キー: 値のペア形式
+  APP_NAME: "Express API"
+  LOG_LEVEL: "info"
+  NODE_ENV: "development"
+  API_PORT: "3000"
