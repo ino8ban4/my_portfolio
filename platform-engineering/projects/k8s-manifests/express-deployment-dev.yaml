@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: express-api-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: express-api
+      env: dev
+  template:
+    metadata:
+      labels:
+        app: express-api
+        env: dev
+    spec:
+      containers:
+      - name: express-api
+        image: node:18-alpine
+        command: ["sh", "-c", "sleep infinity"]
+        envFrom:
+        - configMapRef:
+            name: express-config-dev

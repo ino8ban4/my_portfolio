@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: express-config-prod
+data:
+  APP_NAME: "Express API (Production)"
+  LOG_LEVEL: "error"
+  NODE_ENV: "production"
+  API_PORT: "3000"
