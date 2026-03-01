@@ -1,0 +1,207 @@
+# ============================================================
+# Ingress Template
+# ============================================================
+# 用途: HTTPSアクセスの外部公開・ルーティング
+# 必須フィールド: metadata.name, spec.rules
+# 前提: Ingress Controllerのインストールが必要
+# ============================================================
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: <INGRESS_NAME>  # Ingress名（例: app-ingress, api-ingress）
+  namespace: <NAMESPACE>
+  
+  annotations:
+    # --- Ingress Controllerの種類指定 ---
+    # kubernetes.io/ingress.class: nginx  # ← 古い書き方
+    
+    # --- SSL/TLS設定 ---
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
+    
+    # --- CORS設定 ---
+    # nginx.ingress.kubernetes.io/enable-cors: "true"
+    # nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    
+    # --- リダイレクト設定 ---
+    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    
+    # --- タイムアウト ---
+    # nginx.ingress.kubernetes.io/proxy-connect-timeout: "30"
+    # nginx.ingress.kubernetes.io/proxy-send-timeout: "30"
+    # nginx.ingress.kubernetes.io/proxy-read-timeout: "30"
+
+spec:
+  # --- Ingress Controllerクラス指定（推奨） ---
+  ingressClassName: nginx  # nginx | traefik | alb（AWS）
+  
+  # --- TLS/SSL設定 ---
+  # tls:
+  # - hosts:
+  #   - example.com
+  #   - www.example.com
+  #   secretName: example-tls  # TLS証明書を含むSecret
+  
+  # --- ルーティングルール ---
+  rules:
+  # ドメイン別ルーティング
+  - host: <DOMAIN>  # 例: api.example.com
+    http:
+      paths:
+      # パス別ルーティング
+      - path: /
+        pathType: Prefix  # Prefix | Exact | ImplementationSpecific
+        backend:
+          service:
+            name: <SERVICE_NAME>
+            port:
+              number: 80
+      
+      # 別パスの例
+      # - path: /api
+      #   pathType: Prefix
+      #   backend:
+      #     service:
+      #       name: api-service
+      #       port:
+      #         number: 8080
+  
+  # 別ドメインの例
+  # - host: admin.example.com
+  #   http:
+  #     paths:
+  #     - path: /
+  #       pathType: Prefix
+  #       backend:
+  #         service:
+  #           name: admin-service
+  #           port:
+  #             number: 3000
+
+# ============================================================
+# Ingressとは？
+#
+# Service（NodePort/LoadBalancer）との違い:
+#
+# Service NodePort:
+#   - ポート番号でアクセス（例: http://ip:30080）
+#   - ドメイン使えない
+#   - SSL/TLS設定が面倒
+#
+# Service LoadBalancer:
+#   - 1サービス = 1ロードバランサー（コスト高）
+#   - パスベースルーティング不可
+#
+# Ingress:
+#   - ドメイン名でアクセス（例: https://api.example.com）
+#   - パスベースルーティング（/api, /admin等）
+#   - 1つのIPで複数サービス公開
+#   - SSL/TLS自動化（cert-manager連携）
+#
+# ============================================================
+# pathTypeの違い:
+#
+# Prefix:
+#   /api        → マッチ
+#   /api/users  → マッチ
+#   /api/v1     → マッチ
+#
+# Exact:
+#   /api        → マッチ
+#   /api/users  → マッチしない
+#
+# ImplementationSpecific:
+#   Ingress Controllerに依存
+#
+# ============================================================
+# Ingress Controllerのインストール:
+#
+# minikube:
+#   minikube addons enable ingress
+#
+# Kubernetes（NGINX Ingress）:
+#   kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.1/deploy/static/provider/cloud/deploy.yaml
+#
+# AWS（ALB Ingress）:
+#   AWS Load Balancer Controllerをインストール
+#
+# ============================================================
+# 動作確認:
+#
+# 1. Ingress確認
+#    kubectl get ingress
+#    kubectl describe ingress <INGRESS_NAME>
+#
+# 2. アクセステスト（ローカル）
+#    # /etc/hostsに追加
+#    echo "$(minikube ip) api.example.local" | sudo tee -a /etc/hosts
+#    curl http://api.example.local
+#
+# 3. SSL確認
+#    curl https://api.example.com
+#
+# ============================================================
+# TLS証明書の準備:
+#
+# 方法1: 手動作成
+#   kubectl create secret tls example-tls \
+#     --cert=tls.crt \
+#     --key=tls.key
+#
+# 方法2: cert-manager（自動化）
+#   apiVersion: cert-manager.io/v1
+#   kind: Certificate
+#   metadata:
+#     name: example-cert
+#   spec:
+#     secretName: example-tls
+#     issuerRef:
+#       name: letsencrypt-prod
+#       kind: ClusterIssuer
+#     dnsNames:
+#     - example.com
+#     - www.example.com
+#
+# ============================================================
+# 実例: 複数サービスのルーティング
+#
+# https://example.com/          → frontend-service
+# https://example.com/api/      → backend-service
+# https://admin.example.com/    → admin-service
+#
+# rules:
+# - host: example.com
+#   http:
+#     paths:
+#     - path: /api
+#       pathType: Prefix
+#       backend:
+#         service:
+#           name: backend-service
+#           port:
+#             number: 8080
+#     - path: /
+#       pathType: Prefix
+#       backend:
+#         service:
+#           name: frontend-service
+#           port:
+#             number: 80
+# - host: admin.example.com
+#   http:
+#     paths:
+#     - path: /
+#       pathType: Prefix
+#       backend:
+#         service:
+#           name: admin-service
+#           port:
+#             number: 3000
+#
+# ============================================================
+# 置換項目:
+#   <INGRESS_NAME> : Ingress名
+#   <NAMESPACE>    : Namespace名
+#   <DOMAIN>       : ドメイン名
+#   <SERVICE_NAME> : Service名
+# ============================================================

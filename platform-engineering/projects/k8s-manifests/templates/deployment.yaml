@@ -1,0 +1,85 @@
+# ============================================================
+# Deployment Template
+# ============================================================
+# 用途: アプリケーションのPod管理（複数Pod、自動復旧、ローリングアップデート）
+# 必須フィールド: metadata.name, spec.replicas, spec.selector, spec.template
+# ============================================================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: <APP_NAME>  # アプリ名（例: express-api, nginx-web）
+  labels:
+    app: <APP_NAME>
+
+spec:
+  # Pod数の指定
+  replicas: 2  # 推奨: dev=1, staging=2, prod=3-5
+
+  # どのPodを管理するか（template.metadata.labelsと一致必須）
+  selector:
+    matchLabels:
+      app: <APP_NAME>
+
+  # Podテンプレート
+  template:
+    metadata:
+      labels:
+        app: <APP_NAME>  # selectorと一致させる
+    
+    spec:
+      containers:
+      - name: <CONTAINER_NAME>
+        image: <IMAGE>:<TAG>  # 例: node:18-alpine, nginx:latest, postgres:15
+        
+        # コンテナが待ち受けるポート
+        ports:
+        - containerPort: 3000  # アプリのポート番号
+        
+        # --- 環境変数 ---
+        # 方法1: 直接指定
+        env:
+        - name: ENV_VAR_NAME
+          value: "env_var_value"
+        
+        # 方法2: ConfigMap参照（推奨）
+        envFrom:
+        - configMapRef:
+            name: <CONFIGMAP_NAME>
+        
+        # 方法3: Secret参照
+        # env:
+        # - name: DB_PASSWORD
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: <SECRET_NAME>
+        #       key: password
+        
+        # --- リソース制限（推奨） ---
+        resources:
+          requests:  # 最小保証リソース
+            memory: "128Mi"
+            cpu: "100m"
+          limits:    # 最大使用リソース
+            memory: "256Mi"
+            cpu: "200m"
+        
+        # --- Volumeマウント ---
+        # volumeMounts:
+        # - name: data-volume
+        #   mountPath: /app/data
+      
+      # --- Volume定義 ---
+      # volumes:
+      # - name: data-volume
+      #   persistentVolumeClaim:
+      #     claimName: <PVC_NAME>
+
+# ============================================================
+# 置換項目:
+#   <APP_NAME>        : アプリケーション名
+#   <CONTAINER_NAME>  : コンテナ名
+#   <IMAGE>           : Dockerイメージ名
+#   <TAG>             : イメージタグ
+#   <CONFIGMAP_NAME>  : ConfigMap名
+# ============================================================

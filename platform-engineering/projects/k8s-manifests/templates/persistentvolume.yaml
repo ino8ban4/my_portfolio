@@ -1,0 +1,111 @@
+# ============================================================
+# PersistentVolume (PV) Template
+# ============================================================
+# 用途: クラスタレベルの永続ストレージリソース
+# 必須フィールド: metadata.name, spec.capacity, spec.accessModes
+# 管理者が作成するリソース（開発者はPVCを使用）
+# ============================================================
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: <PV_NAME>  # PV名（例: postgres-pv, data-pv-01）
+
+spec:
+  # ストレージ容量
+  capacity:
+    storage: 10Gi  # 容量指定（例: 1Gi, 10Gi, 100Gi）
+  
+  # アクセスモード
+  accessModes:
+    - ReadWriteOnce  # RWO | ROX | RWX
+  
+  # ストレージクラス名（PVCとマッチング用）
+  storageClassName: manual  # "" | manual | standard | fast-ssd
+  
+  # 永続化ポリシー
+  persistentVolumeReclaimPolicy: Retain  # Retain | Delete | Recycle
+  
+  # --- ストレージタイプ（環境に応じて選択） ---
+  
+  # minikube/開発環境用: hostPath
+  hostPath:
+    path: /mnt/data/<PV_NAME>  # Node上のパス
+    type: DirectoryOrCreate    # Directory | DirectoryOrCreate
+  
+  # 本番環境用: NFS
+  # nfs:
+  #   server: nfs-server.example.com
+  #   path: /exports/<PV_NAME>
+  
+  # AWS EBS
+  # awsElasticBlockStore:
+  #   volumeID: vol-0123456789abcdef
+  #   fsType: ext4
+  
+  # GCP Persistent Disk
+  # gcePersistentDisk:
+  #   pdName: gce-disk-name
+  #   fsType: ext4
+
+# ============================================================
+# accessModes（アクセスモード）:
+#
+# ReadWriteOnce (RWO):
+#   - 1つのNodeから読み書き可能
+#   - 最も一般的（DB、シングルPod用）
+#
+# ReadOnlyMany (ROX):
+#   - 複数Nodeから読み取りのみ
+#   - 用途: 静的コンテンツ配信
+#
+# ReadWriteMany (RWX):
+#   - 複数Nodeから読み書き可能
+#   - 用途: 共有ストレージ（NFS等が必要）
+#
+# ============================================================
+# persistentVolumeReclaimPolicy（削除ポリシー）:
+#
+# Retain（推奨）:
+#   - PVC削除後もPVとデータを保持
+#   - 手動でクリーンアップ必要
+#   - 用途: 本番データ保護
+#
+# Delete:
+#   - PVC削除時にPVも自動削除
+#   - クラウドストレージ（EBS等）で使用
+#   - 用途: 開発環境、一時データ
+#
+# Recycle（非推奨）:
+#   - データ削除後に再利用（廃止予定）
+#
+# ============================================================
+# storageClassName:
+#
+# manual:
+#   - 静的プロビジョニング（手動でPV作成）
+#   - PVCとの手動マッチング
+#
+# standard / fast-ssd 等:
+#   - 動的プロビジョニング（自動でPV作成）
+#   - クラウド環境で使用
+#
+# "":
+#   - StorageClassを使用しない
+#
+# ============================================================
+# hostPath type:
+#
+# Directory:
+#   - 既存ディレクトリが必須
+#
+# DirectoryOrCreate:
+#   - ディレクトリがなければ作成（推奨）
+#
+# File:
+#   - 既存ファイルを指定
+#
+# ============================================================
+# 置換項目:
+#   <PV_NAME> : PersistentVolume名
+# ============================================================

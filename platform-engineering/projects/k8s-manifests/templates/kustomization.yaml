@@ -1,0 +1,135 @@
+# ============================================================
+# Kustomization Template
+# ============================================================
+# 用途: Kustomizeによるマニフェスト管理
+# 配置: base/ または overlays/環境名/
+# ============================================================
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# --- リソース指定 ---
+resources:
+  - deployment.yaml
+  - service.yaml
+  - configmap.yaml
+  # - secret.yaml  # Secretは通常別管理
+  # - persistentvolume.yaml
+  # - persistentvolumeclaim.yaml
+
+# --- 共通ラベル追加 ---
+commonLabels:
+  app: <APP_NAME>
+  managed-by: kustomize
+
+# --- 名前プレフィックス ---
+# namePrefix: dev-
+# nameSuffix: -v1
+
+# --- Namespace指定 ---
+# namespace: <NAMESPACE>
+
+# --- イメージタグ上書き ---
+# images:
+# - name: <IMAGE_NAME>
+#   newTag: v1.2.3
+
+# --- レプリカ数上書き ---
+# replicas:
+# - name: <DEPLOYMENT_NAME>
+#   count: 3
+
+# --- ConfigMap生成 ---
+# configMapGenerator:
+# - name: app-config
+#   literals:
+#   - APP_NAME=MyApp
+#   - LOG_LEVEL=info
+
+# --- Secret生成 ---
+# secretGenerator:
+# - name: app-secret
+#   literals:
+#   - DB_PASSWORD=secret123
+
+# --- パッチ適用 ---
+# patches:
+# - path: patch-deployment.yaml
+#   target:
+#     kind: Deployment
+#     name: <DEPLOYMENT_NAME>
+
+# ============================================================
+# base/kustomization.yaml の例:
+#
+# apiVersion: kustomize.config.k8s.io/v1beta1
+# kind: Kustomization
+# resources:
+# - deployment.yaml
+# - service.yaml
+# - configmap.yaml
+#
+# ============================================================
+# overlays/dev/kustomization.yaml の例:
+#
+# apiVersion: kustomize.config.k8s.io/v1beta1
+# kind: Kustomization
+# 
+# namePrefix: dev-
+# namespace: development
+#
+# resources:
+# - ../../base
+# - configmap-dev.yaml
+#
+# replicas:
+# - name: express-api
+#   count: 1
+#
+# images:
+# - name: myapp
+#   newTag: dev-latest
+#
+# ============================================================
+# overlays/prod/kustomization.yaml の例:
+#
+# apiVersion: kustomize.config.k8s.io/v1beta1
+# kind: Kustomization
+#
+# namePrefix: prod-
+# namespace: production
+#
+# resources:
+# - ../../base
+# - configmap-prod.yaml
+#
+# replicas:
+# - name: express-api
+#   count: 5
+#
+# images:
+# - name: myapp
+#   newTag: v1.0.0
+#
+# patches:
+# - path: service-patch.yaml
+#
+# ============================================================
+# 使い方:
+#
+# マニフェスト生成:
+#   kubectl kustomize overlays/dev/
+#
+# 直接適用:
+#   kubectl apply -k overlays/dev/
+#
+# 出力をファイル保存:
+#   kubectl kustomize overlays/dev/ > dev-manifest.yaml
+#
+# ============================================================
+# 置換項目:
+#   <APP_NAME>         : アプリケーション名
+#   <NAMESPACE>        : Namespace名
+#   <IMAGE_NAME>       : イメージ名
+#   <DEPLOYMENT_NAME>  : Deployment名
+# ============================================================

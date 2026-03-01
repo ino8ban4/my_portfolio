@@ -1,0 +1,129 @@
+# ============================================================
+# PersistentVolumeClaim (PVC) Template
+# ============================================================
+# 用途: PersistentVolumeへのアクセス要求
+# 必須フィールド: metadata.name, spec.accessModes, spec.resources
+# 開発者が作成するリソース（PVは管理者が用意）
+# ============================================================
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: <PVC_NAME>  # PVC名（例: postgres-data, app-storage）
+  namespace: <NAMESPACE>  # Namespace（省略時はdefault）
+
+spec:
+  # アクセスモード（PVと一致させる）
+  accessModes:
+    - ReadWriteOnce  # RWO | ROX | RWX
+  
+  # ストレージクラス名（PVと一致させる）
+  storageClassName: manual  # "" | manual | standard | fast-ssd
+  
+  # 要求するストレージ容量
+  resources:
+    requests:
+      storage: 10Gi  # PVの容量以下を指定
+  
+  # --- オプション: 特定のPVを指定 ---
+  # volumeName: <PV_NAME>  # 特定のPVを直接指定
+  
+  # --- オプション: ラベルセレクタ ---
+  # selector:
+  #   matchLabels:
+  #     environment: production
+  #     team: backend
+
+# ============================================================
+# PVとPVCのマッチング条件:
+#
+# 1. accessModes が一致
+# 2. storageClassName が一致（または両方とも ""）
+# 3. PVCの要求容量 <= PVの提供容量
+# 4. selector条件を満たす（指定時）
+#
+# 上記全て満たすと自動的にBound（紐付き）
+# ============================================================
+# accessModes:
+#
+# ReadWriteOnce (RWO):
+#   - 1つのNodeから読み書き
+#   - 最も一般的
+#   - 用途: DB、シングルPod
+#
+# ReadOnlyMany (ROX):
+#   - 複数Nodeから読み取りのみ
+#   - 用途: 静的コンテンツ配信
+#
+# ReadWriteMany (RWX):
+#   - 複数Nodeから読み書き
+#   - 用途: 共有ストレージ
+#   - 注意: NFSなど特定のストレージのみ対応
+#
+# ============================================================
+# storageClassName:
+#
+# manual:
+#   - 静的プロビジョニング
+#   - 手動でPVを事前作成
+#
+# standard / gp2 / fast-ssd 等:
+#   - 動的プロビジョニング
+#   - PVC作成時にPVを自動作成
+#   - クラウド環境で使用
+#
+# "":
+#   - StorageClassを使用しない
+#   - 既存のPVから選択
+#
+# ============================================================
+# Deploymentでの使用例:
+#
+# spec:
+#   template:
+#     spec:
+#       containers:
+#       - name: app
+#         volumeMounts:
+#         - name: data-volume
+#           mountPath: /app/data
+#       volumes:
+#       - name: data-volume
+#         persistentVolumeClaim:
+#           claimName: <PVC_NAME>
+#
+# ============================================================
+# ライフサイクル:
+#
+# 1. PVC作成
+#    → kubectl apply -f pvc.yaml
+#
+# 2. マッチングするPVを探す
+#    → 条件に合うPVが見つかる
+#
+# 3. Bound状態になる
+#    → kubectl get pvc で STATUS: Bound
+#
+# 4. Podからマウント可能
+#    → volumeMounts で使用
+#
+# 5. PVC削除
+#    → PVのReclaimPolicyに従う
+#       Retain: PVは残る
+#       Delete: PVも削除
+#
+# ============================================================
+# トラブルシューティング:
+#
+# STATUS: Pending の場合:
+#   - マッチするPVがない
+#   - storageClassName確認
+#   - accessModes確認
+#   - 容量確認
+#   - kubectl describe pvc <PVC_NAME> で詳細確認
+#
+# ============================================================
+# 置換項目:
+#   <PVC_NAME>  : PersistentVolumeClaim名
+#   <NAMESPACE> : Namespace名
+# ============================================================

@@ -1,0 +1,129 @@
+# ============================================================
+# Namespace Template
+# ============================================================
+# 用途: リソースの論理的な分離
+# 必須フィールド: metadata.name
+# ============================================================
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: <NAMESPACE_NAME>  # Namespace名（例: development, production, team-frontend）
+  
+  labels:
+    environment: <ENVIRONMENT>  # dev | staging | prod
+    team: <TEAM_NAME>           # チーム名
+    # managed-by: platform-team
+
+# ============================================================
+# Namespaceの用途:
+#
+# 1. リソース分離
+#    - チーム別（team-a, team-b）
+#    - 環境別（dev, staging, prod）
+#    - アプリ別（app-frontend, app-backend）
+#
+# 2. リソースクォータ設定
+#    - CPU/メモリ上限
+#    - Pod数制限
+#
+# 3. アクセス制御（RBAC）
+#    - チームAはNamespace-Aのみアクセス可
+#
+# 4. ネットワーク分離（NetworkPolicy）
+#    - Namespace間通信制限
+#
+# ============================================================
+# デフォルトNamespace:
+#
+# default:
+#   - 明示的に指定しない場合のデフォルト
+#   - 本番では使用非推奨
+#
+# kube-system:
+#   - Kubernetes自身が使用
+#   - 触らない
+#
+# kube-public:
+#   - 全ユーザーから読み取り可能
+#   - ほぼ使わない
+#
+# kube-node-lease:
+#   - Node管理用
+#   - 触らない
+#
+# ============================================================
+# 使い方:
+#
+# Namespace作成:
+#   kubectl apply -f namespace.yaml
+#
+# Namespace確認:
+#   kubectl get namespaces
+#   kubectl get ns  # 省略形
+#
+# Namespace内のリソース確認:
+#   kubectl get pods -n <NAMESPACE_NAME>
+#   kubectl get all -n <NAMESPACE_NAME>
+#
+# Namespace切り替え（kubectlデフォルト設定）:
+#   kubectl config set-context --current --namespace=<NAMESPACE_NAME>
+#
+# Namespace削除（注意: 中のリソースも全削除）:
+#   kubectl delete namespace <NAMESPACE_NAME>
+#
+# ============================================================
+# ResourceQuota例（別ファイルで作成）:
+#
+# apiVersion: v1
+# kind: ResourceQuota
+# metadata:
+#   name: team-quota
+#   namespace: <NAMESPACE_NAME>
+# spec:
+#   hard:
+#     requests.cpu: "10"
+#     requests.memory: "20Gi"
+#     persistentvolumeclaims: "10"
+#     pods: "50"
+#
+# ============================================================
+# LimitRange例（別ファイルで作成）:
+#
+# apiVersion: v1
+# kind: LimitRange
+# metadata:
+#   name: resource-limits
+#   namespace: <NAMESPACE_NAME>
+# spec:
+#   limits:
+#   - max:
+#       cpu: "2"
+#       memory: "4Gi"
+#     min:
+#       cpu: "100m"
+#       memory: "128Mi"
+#     type: Container
+#
+# ============================================================
+# NetworkPolicy例（別ファイルで作成）:
+#
+# apiVersion: networking.k8s.io/v1
+# kind: NetworkPolicy
+# metadata:
+#   name: deny-other-namespaces
+#   namespace: <NAMESPACE_NAME>
+# spec:
+#   podSelector: {}
+#   policyTypes:
+#   - Ingress
+#   ingress:
+#   - from:
+#     - podSelector: {}  # 同じNamespaceのみ許可
+#
+# ============================================================
+# 置換項目:
+#   <NAMESPACE_NAME> : Namespace名
+#   <ENVIRONMENT>    : 環境（dev, staging, prod）
+#   <TEAM_NAME>      : チーム名
+# ============================================================

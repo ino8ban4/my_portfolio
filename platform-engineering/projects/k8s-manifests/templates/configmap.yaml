@@ -1,0 +1,72 @@
+# ============================================================
+# ConfigMap Template
+# ============================================================
+# 用途: アプリケーションの設定データを保存（非機密情報）
+# 必須フィールド: metadata.name, data
+# ============================================================
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: <CONFIGMAP_NAME>  # ConfigMap名（例: app-config, api-settings）
+
+# --- データ形式1: key-value形式 ---
+data:
+  # 環境変数として使用
+  APP_NAME: "My Application"
+  LOG_LEVEL: "info"  # debug | info | warn | error
+  NODE_ENV: "production"  # development | staging | production
+  API_PORT: "3000"
+  
+  # 設定ファイルとして使用
+  app.conf: |
+    server {
+      listen 80;
+      server_name example.com;
+    }
+  
+  config.json: |
+    {
+      "database": {
+        "host": "postgres-service",
+        "port": 5432
+      }
+    }
+
+# ============================================================
+# 使用方法:
+#
+# 方法1: 全てのキーを環境変数として一括取得（推奨）
+# Deployment:
+#   envFrom:
+#   - configMapRef:
+#       name: <CONFIGMAP_NAME>
+#
+# 方法2: 特定のキーのみ環境変数として取得
+# Deployment:
+#   env:
+#   - name: APP_NAME
+#     valueFrom:
+#       configMapKeyRef:
+#         name: <CONFIGMAP_NAME>
+#         key: APP_NAME
+#
+# 方法3: ファイルとしてマウント
+# Deployment:
+#   volumeMounts:
+#   - name: config-volume
+#     mountPath: /etc/config
+#   volumes:
+#   - name: config-volume
+#     configMap:
+#       name: <CONFIGMAP_NAME>
+#
+# ============================================================
+# ベストプラクティス:
+# - 環境別に分ける（app-config-dev, app-config-prod）
+# - 機密情報は入れない（Secret使用）
+# - キー名は大文字＋アンダースコア（ENV_VAR_NAME）
+# ============================================================
+# 置換項目:
+#   <CONFIGMAP_NAME> : ConfigMap名
+# ============================================================
