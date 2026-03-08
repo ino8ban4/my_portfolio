@@ -1,0 +1,14 @@
+appName: express-api
+Kind: Service
+metadata:
+  
+replicaCount: 1
+
+image:
+  repository: express-api
+  tag: v1
+  pullPolicy: Never
+
+service:
+  type: NodePort
+  port: 3000

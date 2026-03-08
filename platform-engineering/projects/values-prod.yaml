@@ -1,0 +1,12 @@
+appName: prod-express-api
+
+replicaCount: 3
+
+image:
+  repository: express-api
+  tag: v1
+  pullPolicy: Never
+
+service:
+  type: NodePort
+  port: 3000
