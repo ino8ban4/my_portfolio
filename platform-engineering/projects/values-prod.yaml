@@ -10,3 +10,6 @@ image:
 service:
   type: NodePort
   port: 3000
+
+configMapName: express-config-prod
+secretName: express-secret

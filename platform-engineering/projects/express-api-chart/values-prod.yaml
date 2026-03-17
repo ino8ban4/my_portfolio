@@ -1,0 +1,6 @@
+configMapName: express-config-prod
+secretName: express-secret
+
+service:
+  type: NodePort
+  port: 3000

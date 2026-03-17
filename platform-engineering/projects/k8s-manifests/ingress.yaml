@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: express-api-ingress
+spec:
+  rules:
+  - host: dev.express-api.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: dev-express-api-service
+            port:
+              number: 3000
+  - host: prod.express-api.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: prod-express-api-service
+            port:
+              number: 3000

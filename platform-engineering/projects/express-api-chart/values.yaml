@@ -1,7 +1,5 @@
 appName: express-api
-Kind: Service
-metadata:
-  
+
 replicaCount: 1
 
 image:
@@ -12,3 +10,6 @@ image:
 service:
   type: NodePort
   port: 3000
+
+configMapName: express-config-dev
+secretName: express-secret
