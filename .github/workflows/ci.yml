@@ -11,6 +11,7 @@ on:
       - main
     paths:
       - 'platform-engineering/projects/docker-express-api/**'
+  workflow_dispatch:  # 手動実行を追加
 
 env:
   REGISTRY: ghcr.io
