@@ -1,0 +1,88 @@
+# ============================================================
+# StatefulSet Template
+# ============================================================
+# 用途: ステートフルなアプリ（DB・キャッシュ等）のPod管理
+# Deploymentとの違い:
+#   - Pod名が固定連番（<name>-0, <name>-1, ...）
+#   - 起動・削除が順番通り（0→1→2）
+#   - volumeClaimTemplatesでPod毎に専用PVCが自動生成される
+# ============================================================
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: <APP_NAME>
+  labels:
+    app: <APP_NAME>
+
+spec:
+  # StatefulSet固有: headless ServiceまたはService名を指定
+  serviceName: <APP_NAME>
+
+  replicas: 1  # 推奨: 本番レプリケーション構成時は2以上
+
+  selector:
+    matchLabels:
+      app: <APP_NAME>
+
+  template:
+    metadata:
+      labels:
+        app: <APP_NAME>
+    
+    spec:
+      containers:
+      - name: <CONTAINER_NAME>
+        image: <IMAGE>:<TAG>  # 例: postgres:15-alpine, redis:7-alpine
+
+        ports:
+        - containerPort: 5432  # アプリのポート番号（postgres=5432, redis=6379）
+
+        # --- 環境変数 ---
+        env:
+        - name: ENV_VAR_NAME
+          value: "env_var_value"
+        # Secretから参照する場合
+        # - name: DB_PASSWORD
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: <SECRET_NAME>
+        #       key: password
+
+        # --- Volumeマウント ---
+        volumeMounts:
+        - name: <VOLUME_NAME>  # volumeClaimTemplatesのmetadata.nameと一致させる
+          mountPath: /var/lib/data  # コンテナ内のマウントパス（例: /var/lib/postgresql/data）
+
+        # --- リソース制限 ---
+        # resources:
+        #   requests:
+        #     memory: "256Mi"
+        #     cpu: "250m"
+        #   limits:
+        #     memory: "512Mi"
+        #     cpu: "500m"
+
+  # --- StatefulSet固有: Pod毎に専用PVCを自動生成 ---
+  # Pod名に紐づいたPVC名が自動生成される
+  # 例: <VOLUME_NAME>-<APP_NAME>-0, <VOLUME_NAME>-<APP_NAME>-1
+  volumeClaimTemplates:
+  - metadata:
+      name: <VOLUME_NAME>
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+      storageClassName: standard  # 動的プロビジョニング使用
+      # storageClassName: manual  # 手動PV使用の場合
+
+# ============================================================
+# 置換項目:
+#   <APP_NAME>        : アプリケーション名
+#   <CONTAINER_NAME>  : コンテナ名
+#   <IMAGE>           : Dockerイメージ名
+#   <TAG>             : イメージタグ
+#   <VOLUME_NAME>     : ボリューム名（PVC名のプレフィックスになる）
+# ============================================================

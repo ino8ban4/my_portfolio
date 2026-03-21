@@ -1,0 +1,66 @@
+# ============================================================
+# NetworkPolicy Template
+# ============================================================
+# 用途: Pod間の通信制御（inbound/outbound トラフィックの制限）
+# 注意: NetworkPolicyを適用するにはCNIプラグイン（Calico/Cilium等）が必要
+#       minikubeデフォルトCNIでは enforcement されない
+#       → minikube start --cni=calico で有効化
+# ============================================================
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: <APP_NAME>-policy
+  namespace: default  # 対象のNamespace
+
+spec:
+  # どのPodにこのポリシーを適用するか
+  podSelector:
+    matchLabels:
+      app: <APP_NAME>  # 対象PodのラベルはDeploymentのselectorと一致させる
+
+  # 制御対象（Ingress=受信, Egress=送信, 両方も可）
+  policyTypes:
+  - Ingress
+  # - Egress
+
+  # --- 受信ルール（Ingressを制御する場合） ---
+  ingress:
+  # 許可パターン1: 同じnamespace内の特定Podからのみ許可
+  - from:
+    - podSelector:
+        matchLabels:
+          app: <ALLOWED_APP_NAME>  # アクセスを許可するPodのラベル
+
+  # 許可パターン2: 同じnamespace内の全Podから許可
+  # - from:
+  #   - podSelector: {}
+
+  # 許可パターン3: 特定のnamespaceから許可
+  # - from:
+  #   - namespaceSelector:
+  #       matchLabels:
+  #         name: <NAMESPACE_NAME>
+
+  # 許可パターン4: ポートを限定して許可
+  # - from:
+  #   - podSelector:
+  #       matchLabels:
+  #         app: <ALLOWED_APP_NAME>
+  #   ports:
+  #   - protocol: TCP
+  #     port: 3000
+
+  # --- 送信ルール（Egressを制御する場合） ---
+  # egress:
+  # - to:
+  #   - podSelector:
+  #       matchLabels:
+  #         app: <TARGET_APP_NAME>
+
+# ============================================================
+# 置換項目:
+#   <APP_NAME>          : ポリシーを適用するPodのアプリ名
+#   <ALLOWED_APP_NAME>  : アクセスを許可するPodのアプリ名
+#   <NAMESPACE_NAME>    : 許可するNamespace名
+# ============================================================
