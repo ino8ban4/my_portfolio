@@ -1,0 +1,65 @@
+# ============================================================
+# Service Template
+# ============================================================
+# 用途: Podへのネットワークアクセス経路を提供（負荷分散、サービスディスカバリ）
+# 必須フィールド: metadata.name, spec.selector, spec.ports
+# ============================================================
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-staging-service  # Service名（例: express-api-service）
+
+spec:
+  # Serviceタイプ（用途に応じて選択）
+  type: NodePort  # ClusterIP | NodePort | LoadBalancer
+  
+  # どのPodに転送するか（Deploymentのlabelsと一致）
+  selector:
+    app: ex1-nginx
+  
+  # ポート設定
+  ports:
+  - port: 80        # Service内部ポート（クラスタ内からアクセス）
+    targetPort: 80  # Podのコンテナポート（containerPortと一致）
+    nodePort: 30080   # 外部公開ポート（NodePort/LoadBalancerのみ、30000-32767）
+    protocol: TCP
+
+# ============================================================
+# Serviceタイプ説明:
+#
+# ClusterIP（デフォルト）:
+#   - クラスタ内部からのみアクセス可能
+#   - 用途: マイクロサービス間通信、DB接続
+#   - nodePortは不要
+#
+# NodePort:
+#   - 外部からNodeのIPでアクセス可能
+#   - 用途: 開発環境、minikube
+#   - nodePort必須（30000-32767）
+#
+# LoadBalancer:
+#   - クラウドのロードバランサーを自動作成
+#   - 用途: 本番環境（AWS ELB, GCP LB等）
+#   - nodePortは自動割り当て
+#
+# ============================================================
+# ポート種類:
+#
+# port:
+#   Service自身のポート（クラスタ内からアクセス）
+#   例: curl http://express-api-service:3000
+#
+# targetPort:
+#   Podのコンテナが待ち受けるポート
+#   Deployment.spec.containers.ports.containerPortと一致
+#
+# nodePort:
+#   外部公開ポート（30000-32767の範囲）
+#   例: curl http://minikube-ip:30300
+#
+# ============================================================
+# 置換項目:
+#   <SERVICE_NAME> : Service名
+#   <APP_NAME>     : アプリ名（Podのlabelと一致）
+# ============================================================
