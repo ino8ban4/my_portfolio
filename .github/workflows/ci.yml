@@ -11,7 +11,7 @@ on:
       - main
     paths:
       - 'platform-engineering/projects/docker-express-api/**'
-  workflow_dispatch:  # 手動実行を追加
+  workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
@@ -21,7 +21,7 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
 
     steps:
@@ -52,3 +52,14 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Update image tag in values.yaml
+        if: github.event_name != 'pull_request'
+        run: |
+          SHA_TAG="sha-$(echo ${{ github.sha }} | cut -c1-7)"
+          sed -i "s/tag: .*/tag: ${SHA_TAG}/"             platform-engineering/projects/express-api-chart/values.yaml
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add platform-engineering/projects/express-api-chart/values.yaml
+          git commit -m "ci: update image tag to ${SHA_TAG}"
+          git push

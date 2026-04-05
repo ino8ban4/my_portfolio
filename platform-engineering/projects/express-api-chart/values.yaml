@@ -3,9 +3,9 @@ appName: express-api
 replicaCount: 1
 
 image:
-  repository: express-api
+  repository: ghcr.io/ino8ban4/express-api
   tag: v1
-  pullPolicy: Never
+  pullPolicy: Always
 
 service:
   type: NodePort
