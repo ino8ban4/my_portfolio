@@ -1,0 +1,7 @@
+replicaCount: 1
+
+image:
+  pullPolicy: Always
+
+configMapName: express-config-dev
+secretName: express-secret-dev

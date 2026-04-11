@@ -1,6 +1,7 @@
-configMapName: express-config-prod
-secretName: express-secret
+replicaCount: 3
 
-service:
-  type: NodePort
-  port: 3000
+image:
+  pullPolicy: IfNotPresent
+
+configMapName: express-config-prod
+secretName: express-secret-prod
