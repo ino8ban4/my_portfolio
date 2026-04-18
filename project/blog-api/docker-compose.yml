@@ -1,0 +1,32 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    env_file:
+      - .env
+    volumes:
+      - .:/workspace
+      - ~/.config/nvim:/root/.config/nvim
+      - node_modules:/workspace/node_modules
+    ports:
+      - "3000:3000"
+      - "5555:5555"
+    stdin_open: true
+    tty: true
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: blog
+      POSTGRES_PASSWORD: blog
+      POSTGRES_DB: blog
+    volumes:
+      - postgres_data:/var/lib/postgresql/postgres_data
+    ports:
+      - "5433:5432"
+
+volumes:
+  node_modules:
+  postgres_data:
+
