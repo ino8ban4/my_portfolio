@@ -1,0 +1,74 @@
+name: CI - Build and Push Blog API Image
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'project/blog-api/**'
+  pull_request:
+    branches:
+    - main
+    paths:
+      - 'project/blog-api/**'
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/blog-api
+  
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=sha-
+            type=ref,event=branch
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+             
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v5
+        with:
+          context: project/blog-api
+          platforms: linux/amd64,linux/arm64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Update image tag in values.yaml
+        if: github.event_name != 'pull_request'
+        run: |
+          SHA_TAG="sha-$(echo ${{ github.sha }} | cut -c1-7)"
+          sed -i "s/tag: .*/tag: ${SHA_TAG}/" \
+            project/blog-api/blog-api-chart/values.yaml
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add project/blog-api/blog-api-chart/values.yaml
+          git commit -m  "ci: update image tag to ${SHA_TAG}"
+          git push
+
