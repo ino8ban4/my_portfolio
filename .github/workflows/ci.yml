@@ -71,3 +71,11 @@ jobs:
           git add platform-engineering/projects/express-api-chart/values.yaml
           git commit -m "ci: update image tag to ${SHA_TAG}"
           git push
+
+      - name: Run Trivy vulnerability scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          format: table
+          exit-code: '0'
+          severity: 'HIGH,CRITICAL'
