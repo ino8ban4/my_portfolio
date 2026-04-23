@@ -4,7 +4,7 @@ replicaCount: 1
 
 image:
   repository: ghcr.io/ino8ban4/express-api
-  tag: sha-1e7c81d
+  tag: sha-765354b
   pullPolicy: Always
 
 service:
