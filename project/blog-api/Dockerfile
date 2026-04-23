@@ -1,4 +1,15 @@
-FROM node:22-alpine AS runnner
+FROM node:alpine AS builder
+
+WORKDIR /workspace
+
+COPY package.json .
+RUN npm install
+
+COPY . .
+RUN npm run build
+
+
+FROM node:22-alpine AS runner
 
 WORKDIR /workspace
 
