@@ -4,79 +4,60 @@ Helm chart for deploying Express API to Kubernetes with dev/prod environment sup
 
 ## Overview
 
-This chart deploys a Node.js Express API with environment-specific configuration managed via external ConfigMaps and Secrets.
+This chart deploys a Node.js Express API with environment-specific configuration.
+ConfigMaps, Secrets, and NetworkPolicy are all managed within this chart.
 
 ## Prerequisites
 
 - Kubernetes 1.20+
 - Helm 3.0+
+- Calico CNI（NetworkPolicy適用に必要）
 - minikube (for local development)
-- ConfigMap and Secret pre-created in the target namespace
-
-## Required Resources
-
-The following resources must exist in the cluster before deploying:
-
-| Kind      | Name (dev)         | Name (prod)         |
-|-----------|--------------------|---------------------|
-| ConfigMap | express-config-dev | express-config-prod |
-| Secret    | express-secret     | express-secret      |
 
 ## Installation
 
 ### Dev environment
 ```bash
-helm install dev-express-api ./express-api-chart
+helm upgrade --install express-api . -f values.yaml -f values-dev.yaml -n dev
 ```
 
 ### Prod environment
 ```bash
-helm install prod-express-api ./express-api-chart -f values-prod.yaml
-```
-
-## Upgrade
-```bash
-helm upgrade dev-express-api ./express-api-chart
-helm upgrade prod-express-api ./express-api-chart -f values-prod.yaml
+helm upgrade --install express-api . -f values.yaml -f values-prod.yaml -n prod
 ```
 
 ## Values
 
-| Parameter       | Description                        | Default            |
-|-----------------|------------------------------------|--------------------|
-| appName         | Application name                   | express-api        |
-| replicaCount    | Number of replicas                 | 1                  |
-| image.repository| Container image name               | express-api        |
-| image.tag       | Container image tag                | v1                 |
-| image.pullPolicy| Image pull policy                  | Never              |
-| service.type    | Kubernetes Service type            | NodePort           |
-| service.port    | Application port                   | 3000               |
-| configMapName   | Name of the ConfigMap to mount     | express-config-dev |
-| secretName      | Name of the Secret to mount        | express-secret     |
+| Parameter        | Description                    | Default            |
+|------------------|--------------------------------|--------------------|
+| replicaCount     | Number of replicas             | 1                  |
+| image.repository | Container image name           | express-api        |
+| image.tag        | Container image tag            | sha-xxxxxxx        |
+| image.pullPolicy | Image pull policy              | Always             |
+| service.type     | Kubernetes Service type        | NodePort           |
+| service.port     | Application port               | 3000               |
+| configMapName    | Name of the ConfigMap to mount | express-config-dev |
+| secretName       | Name of the Secret to mount    | express-secret     |
 
 ## Resource Naming
 
-All Kubernetes resources are named using `{{ .Release.Name }}` to avoid conflicts between dev and prod deployments in the same namespace.
+All Kubernetes resources are named using `{{ .Release.Name }}` to avoid conflicts between dev and prod deployments.
 
-| Resource   | Name pattern                  | Example                   |
-|------------|-------------------------------|---------------------------|
-| Deployment | `<release-name>`              | dev-express-api           |
-| Service    | `<release-name>-service`      | dev-express-api-service   |
+| Resource      | Name pattern         |
+|---------------|----------------------|
+| Deployment    | `<release-name>`     |
+| Service       | `<release-name>`     |
+| NetworkPolicy | `<release-name>`     |
 
-## Ingress
+## NetworkPolicy
 
-Ingress is managed outside this chart via `k8s-manifests/ingress.yaml`.
+NetworkPolicyをHelmチャートに組み込み、不要なトラフィックを遮断しています。
 
-| Host                    | Backend                   |
-|-------------------------|---------------------------|
-| dev.express-api.local   | dev-express-api-service   |
-| prod.express-api.local  | prod-express-api-service  |
-
-> **Note:** Ingress via hostname is not accessible on minikube with Docker driver on Mac.
-> Use port-forward or `minikube service` for local verification.
+- Ingress: port 3000のみ許可
+- Egress: DNS（port 53）のみ許可
 
 ## Uninstall
 ```bash
-helm uninstall dev-express-api
-helm uninstall prod-express-api
+helm uninstall express-api -n dev
+helm uninstall express-api -n prod
 ```
