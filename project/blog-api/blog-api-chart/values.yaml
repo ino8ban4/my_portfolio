@@ -1,5 +1,5 @@
 image:
-  repository: ghcr.io/dev_fuji/blog-api
+  repository: ghcr.io/ino8ban4/blog-api
   tag: sha-ebac6ea
   pullPolicy: IfNotPresent
 
