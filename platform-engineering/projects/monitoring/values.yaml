@@ -1,0 +1,3 @@
+# kube-prometheus-stack values
+grafana:
+  adminPassword: prom-operator
