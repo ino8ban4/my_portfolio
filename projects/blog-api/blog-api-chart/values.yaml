@@ -1,6 +1,6 @@
 image:
   repository: ghcr.io/ino8ban4/blog-api
-  tag: sha-ebac6ea
+  tag: sha-d43b824
   pullPolicy: IfNotPresent
 
 replicaCount: 1
