@@ -1,0 +1,20 @@
+FROM node:20-alpine
+
+RUN apk add --no-cache \
+    neovim \
+    git \
+    curl \
+    bash \
+    gcc \
+    musl-dev \
+    tmux
+
+WORKDIR /workspace
+
+COPY package.json .
+
+RUN npm install
+
+RUN echo "alias ll='ls -la'" >> /root/.bashrc
+
+CMD ["tail", "-f", "/dev/null"]
