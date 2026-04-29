@@ -5,12 +5,12 @@ on:
     branches:
       - main
     paths:
-      - 'project/blog-api/**'
+      - 'projects/blog-api/**'
   pull_request:
     branches:
     - main
     paths:
-      - 'project/blog-api/**'
+      - 'projects/blog-api/**'
   workflow_dispatch:
 
 env:
@@ -54,7 +54,7 @@ jobs:
       - name: Build and push Docker images
         uses: docker/build-push-action@v5
         with:
-          context: project/blog-api
+          context: projects/blog-api
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
@@ -65,10 +65,10 @@ jobs:
         run: |
           SHA_TAG="sha-$(echo ${{ github.sha }} | cut -c1-7)"
           sed -i "s/tag: .*/tag: ${SHA_TAG}/" \
-            project/blog-api/blog-api-chart/values.yaml
+            projects/blog-api/blog-api-chart/values.yaml
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add project/blog-api/blog-api-chart/values.yaml
+          git add projects/blog-api/blog-api-chart/values.yaml
           git commit -m  "ci: update image tag to ${SHA_TAG}"
           git push
 
