@@ -18,6 +18,7 @@ COPY package.json .
 RUN npm install --omit=dev
 
 COPY --from=builder /workspace/dist ./dist
+COPY --from=builder /workspace/src/generated ./src/generated
 
 CMD ["npm", "start"]
 
