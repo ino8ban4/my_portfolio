@@ -1,0 +1,24 @@
+{
+  "name": "blog-api",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "nodemon --watch src --ext ts --exec ts-node src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+   },
+   "dependencies": {
+     "fastify": "^5.0.0",
+     "@fastify/swagger": "9.0.0",
+     "@fastify/swagger-ui": "5.0.0",
+     "prisma": "^6.0.0",
+     "@prisma/client": "^6.0.0"
+   },
+   "devDependencies": {
+     "typescript": "^5.0.0",
+     "@types/node": "^22.0.0",
+     "ts-node": "^10.0.0",
+     "nodemon": "^3.0.0"
+   }
+}
+  
+
