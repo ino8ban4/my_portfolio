@@ -7,7 +7,7 @@ services:
       - .env
     volumes:
       - .:/workspace
-      - ~/.config/nvim:/root/.config/nvim
+      - ~/dotfiles:/root/dotfiles
       - node_modules:/workspace/node_modules
     ports:
       - "3000:3000"

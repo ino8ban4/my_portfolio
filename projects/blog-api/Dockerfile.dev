@@ -7,7 +7,8 @@ RUN apk add --no-cache \
     bash \
     gcc \
     musl-dev \
-    tmux
+    tmux \
+    stow
 
 
 WORKDIR /workspace
@@ -17,4 +18,5 @@ COPY package.json .
 RUN npm install
 RUN echo "alias ll='ls -la'" >> /root/.bashrc
 
-CMD ["tail", "-f", "/dev/null"]
+CMD ["sh", "-c", "stow -d /root/dotfiles nvim tmux ghostty && tail -f /dev/null"]
+
