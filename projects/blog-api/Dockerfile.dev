@@ -18,5 +18,4 @@ COPY package.json .
 RUN npm install
 RUN echo "alias ll='ls -la'" >> /root/.bashrc
 
-CMD ["sh", "-c", "stow -d /root/dotfiles nvim tmux ghostty && tail -f /dev/null"]
-
+CMD ["sh", "-c", "stow -d /root/dotfiles nvim tmux ghostty && npm run dev"]
