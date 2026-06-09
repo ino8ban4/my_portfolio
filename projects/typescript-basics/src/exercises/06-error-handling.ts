@@ -12,7 +12,7 @@ type User = {
 async function fetchUser(): Promise<User>{
 
   try{
- /return { id: 1, name: "taro"}
+ return { id: 1, name: "taro"}
   }catch(e){
     if(e instanceof Error){
     console.error(e.message);

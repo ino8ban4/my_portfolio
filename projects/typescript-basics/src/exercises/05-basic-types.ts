@@ -15,7 +15,7 @@ async function fetchUser() : Promise<User>{
 
 async function main(): Promise<void>{
   const user = await fetchUser();
-  console.log(user;
+  console.log(user);
 };
 
 main()
