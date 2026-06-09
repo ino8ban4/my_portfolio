@@ -1,6 +1,8 @@
 import Fastify from 'fastify'
 import swagger from '@fastify/swagger'
 import swaggerUi from '@fastify/swagger-ui'
+import { postRoutes } from './routes/posts'
+
 
 const app = Fastify({ logger: true})
 
@@ -18,6 +20,8 @@ const start = async(): Promise<void> => {
     await app.register(swaggerUi, {
       routePrefix: '/docs'
     })
+
+  await app.register(postRoutes);
 
   app.get('/health', async() => {
     return { status: 'ok', timestamp: new Date().toISOString() }
