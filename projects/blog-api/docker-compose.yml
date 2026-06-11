@@ -8,10 +8,12 @@ services:
     volumes:
       - .:/workspace
       - ~/dotfiles:/root/dotfiles
+      - ~/.ssh/id_ed25519_dev.pub:/root/.ssh_keys/authorized_keys:ro
       - node_modules:/workspace/node_modules
     ports:
       - "3000:3000"
       - "5555:5555"
+      - "2222:22"
     stdin_open: true
     tty: true
 
