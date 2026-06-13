@@ -3,50 +3,78 @@ import prisma from "../prisma";
 
 export async function postRoutes(app: FastifyInstance) {
   
-  // 全件取得
+  // GET:全件取得
   app.get('/posts', async () => {
     return await prisma.post.findMany()
   })
 
 
-  // 1件取得
-  app.get<{ Params: {id: string } }>('/posts/:id', async(request, reply) => {
-
-    const { id } = request.params;
-
-    const post = await prisma.post.findUnique({
-      where: { id: Number(id) }
-    })
-    
-    if (!post){
-      return reply.code(404).send({ error: 'not found'})
+  // GET:1件取得
+  app.get<{ Params: {id: string } }>('/posts/:id', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: {
+          id: { type: 'string'}
+        }
+      }
     }
+  }, async( request ) => {
+       const { id } = request.params;
 
-    return post
-  })
+       const post = await prisma.post.findUnique({
+         where: { id: Number(id) }
+        })
+        
+        return post
+      })
 
 
-  // データ登録
-  app.post<{ Body: { title: string, content: string} }>('/posts', async(request, reply ) => {
+
+  // POST:データ登録
+  app.post<{ Body: { title: string, content: string} }>('/posts', {
+    schema: {
+      body: {
+        type: 'object',
+        required: ['title', 'content'],
+        properties: {
+          title: { type: 'string' },
+          content: { type: 'string' },
+        }
+      }
+    }
+  }, async(request, reply ) => {
     const { title, content } = request.body;
-
-     if(!title || !content){
-      return reply.code(400).send({ error: 'title and content are required'})
-    }
 
     return await prisma.post.create({ data: {title, content } });
   });
 
 
-  // データ更新
+  // PUT:データ更新
   app.put<{ Body: { title: string, content: string, published: boolean} , Params: { id: string } }>(
-    '/posts/:id', async(request, reply ) => {
+    '/posts/:id', {
+      schema: {
+        body: {
+          type: 'object',
+          required: ['title', 'content', 'published'],
+          properties: {
+            title: { type: 'string'},
+            content: { type: 'string'},
+            published: { type: 'boolean'},
+          }
+        },
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: {
+          id: { type: 'string'}
+        }
+      }
+    }
+  }, async( request ) => {
     const { title, content, published } = request.body;
     const { id } = request.params;
-
-    if(!title || !content){
-      return reply.code(400).send({ error: 'title and content are required'})
-    }
 
     return await prisma.post.update({
       where: { id: Number(id)},
@@ -55,8 +83,18 @@ export async function postRoutes(app: FastifyInstance) {
   })
   
 
-  // データ削除
-  app.delete<{ Params: {id: string } }>('/posts/:id', async(request) => {
+  // DELETE:データ削除
+  app.delete<{ Params: {id: string } }>('/posts/:id', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: {
+          id: { type: 'string'}
+        }
+      }
+    }
+  }, async(request) => {
     const { id } = request.params;
 
     return await prisma.post.delete({

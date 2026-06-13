@@ -24,7 +24,7 @@ services:
       POSTGRES_PASSWORD: blog
       POSTGRES_DB: blog
     volumes:
-      - postgres_data:/var/lib/postgresql/postgres_data
+      - postgres_data:/var/lib/postgresql/data
     ports:
       - "5433:5432"
 
