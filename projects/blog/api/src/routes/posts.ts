@@ -20,13 +20,17 @@ export async function postRoutes(app: FastifyInstance) {
         }
       }
     }
-  }, async( request ) => {
+  }, async(request, reply) => {
        const { id } = request.params;
 
        const post = await prisma.post.findUnique({
          where: { id: Number(id) }
         })
         
+        if (!post){
+          return reply.code(404).send({ error: 'not found'})
+        }
+
         return post
       })
 

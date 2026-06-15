@@ -1,0 +1,49 @@
+services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile.dev
+    env_file:
+      - ./api/.env
+    volumes:
+      - ./api:/workspace
+      - ~/dotfiles:/root/dotfiles
+      - ~/.ssh/id_ed25519_dev.pub:/root/.ssh_keys/authorized_keys:ro
+      - api_node_modules:/workspace/node_modules
+    ports:
+      - "3000:3000"
+      - "5555:5555"
+      - "2222:22"
+    stdin_open: true
+    tty: true
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./frontend:/workspace
+      - ~/dotfiles:/root/dotfiles
+      - ~/.ssh/id_ed25519_dev.pub:/root/.ssh_keys/authorized_keys:ro
+      - frontend_node_modules:/workspace/node_modules
+    ports:
+      - "3001:3001"
+      - "2223:22"
+    stdin_open: true
+    tty: true
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: blog
+      POSTGRES_PASSWORD: blog
+      POSTGRES_DB: blog
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+volumes:
+  api_node_modules:
+  frontend_node_modules:
+  postgres_data:
