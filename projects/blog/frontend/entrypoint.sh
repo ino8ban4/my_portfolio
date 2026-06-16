@@ -8,4 +8,4 @@ ssh-keygen -A
 echo "cd /workspace" >> /root/.profile
 echo "alias ll='ls -la'" >> /root/.profile
 /usr/sbin/sshd
-npm run dev -- -p 3001
+npm run dev -- -p 3001 -H 0.0.0.0

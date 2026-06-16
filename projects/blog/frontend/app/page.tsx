@@ -1,5 +1,5 @@
 export default async function Home(){
-  const res = await fetch('http://localhost:3000/posts')
+  const res = await fetch('http://api:3000/posts')
   const posts = await res.json()
 
   return (
