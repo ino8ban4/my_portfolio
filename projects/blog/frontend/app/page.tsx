@@ -7,6 +7,7 @@ export default async function Home(){
   return (
     <main>
       <h1>Blog Posts</h1>
+      <Link href="/posts/new">新規投稿</Link>
       <ul>
         {posts.map((post: { id: number; title: string }) => (
           <li key={post.id}>
