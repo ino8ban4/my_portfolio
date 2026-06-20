@@ -47,5 +47,5 @@ volumes:
   api_node_modules:
   frontend_node_modules:
   postgres_data:
-      name: blog-api_postgres_data
+      name: blog_postgres_data
 
