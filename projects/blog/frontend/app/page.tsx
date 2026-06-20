@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 export default async function Home(){
   const res = await fetch('http://api:3000/posts')
   const posts = await res.json()
@@ -7,7 +9,8 @@ export default async function Home(){
       <h1>Blog Posts</h1>
       <ul>
         {posts.map((post: { id: number; title: string }) => (
-          <li key={post.id}>{post.title}</li>
+          <li key={post.id}>
+          <Link href={`/posts/${post.id}`}>{post.title}</Link></li>
         ))}
       </ul>
     </main>
