@@ -27,7 +27,7 @@ export default async function PostPage({ params }: Props) {
       <p>{post.content}</p>
 
       <form action={deletePostWithId}>
-      <button type="submit">削除</button>
+      <button type="submit" data-testid="delete-button">削除</button>
       </form>
 
     </main>

@@ -20,9 +20,12 @@ async function createPost(formData: FormData) {
 export default function NewPostPage() {
   return (
     <form action={createPost}>
-    <input name="title" />
-    <textarea name="content" />
-    <button type="submit">投稿</button>
+    <label htmlFor="title" >タイトル</label>
+    <input id="title" name="title" />
+
+    <label htmlFor="content" >本文</label>
+    <textarea id="content" name="content" />
+    <button type="submit" data-testid="submit-button">投稿</button>
     </form>
   )
 }
