@@ -32,6 +32,15 @@ services:
     stdin_open: true
     tty: true
 
+  e2e:
+    image: mcr.microsoft.com/playwright:v1.61.1-jammy
+    volumes:
+      - ./frontend:/workspace
+    working_dir: /workspace
+    command: tail -f /dev/null
+    depends_on:
+      - frontend
+
   db:
     image: postgres:16-alpine
     environment:
