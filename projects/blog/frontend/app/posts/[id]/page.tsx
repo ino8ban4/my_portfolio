@@ -22,15 +22,19 @@ export default async function PostPage({ params }: Props) {
   const deletePostWithId = deletePost.bind(null, id)
 
   return (
-    <main>
-      <h1>{post.title}</h1>
-      <p>{post.content}</p>
+    <main className="max-w-md p-6 flex flex-col gap-4">
+      <h1 className="text-2x1 font-bold">{post.title}</h1>
+      <p className="text-netutral-300">{post.content}</p>
 
       <form action={deletePostWithId}>
-      <button type="submit" data-testid="delete-button">削除</button>
-      </form>
-
-    </main>
+      <button 
+        type="submit"
+        data-testid="delete-button"
+        className="bg-blue-600 hover:bg-blue-500 text-white rounded px-4 py-2 w-fit'">
+      削除
+      </button>
+    </form>
+  </main>
   )
 }
 

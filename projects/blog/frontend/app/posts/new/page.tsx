@@ -19,13 +19,30 @@ async function createPost(formData: FormData) {
 
 export default function NewPostPage() {
   return (
-    <form action={createPost}>
-    <label htmlFor="title" >タイトル</label>
-    <input id="title" name="title" />
+    <form action={createPost} className='flex flex-col gap-4 max-w-md p-6'>
+    <div className='flex flex-col gap-1'>
+      <label htmlFor="title" >タイトル</label>
+      <input id="title"
+             name="title"
+             className='bg-netural-900 border border-neutral-600 next-neutral-100 rounded px-3 py-2'
+      />
+    </div>
 
+
+    <div className='flex flex-col gap-1'>
     <label htmlFor="content" >本文</label>
-    <textarea id="content" name="content" />
-    <button type="submit" data-testid="submit-button">投稿</button>
+    <textarea id="content" 
+              name="content" 
+              className='bg-netural-900 border border-neutral-600 next-neutral-100 rounded px-3 py-2 min-h-32'
+    />
+    </div>
+
+    <button type="submit"
+            data-testid="submit-button"
+            className='bg-blue-600 hover:bg-blue-500 text-white rounded px-4 py-2 w-fit'
+            >
+            投稿
+            </button>
     </form>
   )
 }
