@@ -22,6 +22,11 @@ jobs:
       - name: Wait for frontend to be ready
         run: npx wait-on http://localhost:3001 --timeout 120000
 
+      - name: Show container logs on failure
+        if: failure()
+        working-directory: projects/blog
+        run: docker compose logs
+
       - name: Install Playwright deps in e2e container
         working-directory: projects/blog
         run: |
