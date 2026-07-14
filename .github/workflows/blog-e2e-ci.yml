@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up env file for CI
-        working-directory: project/blog/api
+        working-directory: projects/blog/api
         run: cp .env.ci .env
 
       - name: Build and start Docker Compose services
