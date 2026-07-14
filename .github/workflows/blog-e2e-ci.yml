@@ -11,6 +11,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up env file for CI
+        working-directory: project/blog/api
+        run: cp .env.ci .env
+
       - name: Build and start Docker Compose services
         working-directory: projects/blog
         run: docker compose up -d --build db api frontend e2e
