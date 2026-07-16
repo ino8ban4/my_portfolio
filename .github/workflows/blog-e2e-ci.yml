@@ -19,8 +19,8 @@ jobs:
         working-directory: projects/blog
         run: docker compose up -d --build db api frontend e2e
 
-      - name: Wait for frontend to be ready
-        run: npx wait-on http://localhost:3001 --timeout 120000
+      - name: Wait for service to be ready
+        run: npx wait-on http://localhost:3000/health http://localhost:3001 --timeout 120000
 
       - name: Show container logs on failure
         if: failure()
