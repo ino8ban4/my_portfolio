@@ -8,4 +8,7 @@ ssh-keygen -A
 echo "cd /workspace" >> /root/.profile
 echo "alias ll='ls -la'" >> /root/.profile
 /usr/sbin/sshd
+
+npm prisma generate
+
 npm run dev
