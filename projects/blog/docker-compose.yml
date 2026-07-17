@@ -9,7 +9,6 @@ services:
       - ./api:/workspace
       - ~/dotfiles:/root/dotfiles
       - ~/.ssh/id_ed25519_dev.pub:/root/.ssh_keys/authorized_keys:ro
-      - api_node_modules:/workspace/node_modules
     ports:
       - "3000:3000"
       - "5555:5555"
@@ -17,7 +16,7 @@ services:
     stdin_open: true
     tty: true
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/health"]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -31,7 +30,6 @@ services:
       - ./frontend:/workspace
       - ~/dotfiles:/root/dotfiles
       - ~/.ssh/id_ed25519_dev.pub:/root/.ssh_keys/authorized_keys:ro
-      - frontend_node_modules:/workspace/node_modules
     ports:
       - "3001:3001"
       - "2223:22"
@@ -62,8 +60,6 @@ services:
       - "5433:5432"
 
 volumes:
-  api_node_modules:
-  frontend_node_modules:
   postgres_data:
       name: blog_postgres_data
 
