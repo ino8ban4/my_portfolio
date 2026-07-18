@@ -11,4 +11,5 @@ if [ -d /root/dotfiles/nvim ]; then
   /usr/sbin/sshd
 fi
 
-  npm run dev -- -p 3001 -H 0.0.0.0
+npm install
+npm run dev -- -p 3001 -H 0.0.0.0
