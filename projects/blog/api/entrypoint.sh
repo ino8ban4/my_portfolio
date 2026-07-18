@@ -12,6 +12,6 @@ if [ -d /root/dotfiles/nvim ]; then
 fi
 
 npm install
-npm prisma generate
+npx prisma generate
 
 npm run dev
