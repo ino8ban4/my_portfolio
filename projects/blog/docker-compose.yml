@@ -16,6 +16,12 @@ services:
       - "2222:22"
     stdin_open: true
     tty: true
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
 
   frontend:
     build:
@@ -31,6 +37,9 @@ services:
       - "2223:22"
     stdin_open: true
     tty: true
+    depends_on:
+      api:
+        condition: service_healthy
 
   e2e:
     image: mcr.microsoft.com/playwright:v1.61.1-jammy
