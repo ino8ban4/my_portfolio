@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
 async function deletePost(id: string) {
@@ -23,18 +24,27 @@ export default async function PostPage({ params }: Props) {
 
   return (
     <main className="max-w-md p-6 flex flex-col gap-4">
-      <h1 className="text-2x1 font-bold">{post.title}</h1>
-      <p className="text-netutral-300">{post.content}</p>
+      <h1 className="text-2xl font-bold">{post.title}</h1>
+      <p className="text-neutral-300">{post.content}</p>
+
+      <div className="flex gap-2">
+        <Link
+          href={`/posts/${id}/edit`}
+          className="bg-neutral-700 hover:bg-neutral-600 text-white rounded px-4 py-2 w-fit"
+        >
+        編集
+      </Link>
 
       <form action={deletePostWithId}>
       <button 
         type="submit"
         data-testid="delete-button"
-        className="bg-blue-600 hover:bg-blue-500 text-white rounded px-4 py-2 w-fit'">
+        className="bg-red-600 hover:bg-red-500 text-white rounded px-4 py-2 w-fit">
       削除
       </button>
-    </form>
-  </main>
+      </form>
+      </div>
+    </main>
   )
 }
 

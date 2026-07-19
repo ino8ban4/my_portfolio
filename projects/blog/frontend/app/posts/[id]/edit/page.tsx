@@ -59,7 +59,7 @@ export default async function EditPostPage({ params }: Props) {
       type="submit"
       className="bg-blue-600 hover:bg-blue-500 text-white rounded px-4 py-2 w-fit"
       >
-        変更
+        編集
       </button>
     </form>
   )
