@@ -5,11 +5,12 @@ async function createPost(formData: FormData) {
   
   const title = formData.get('title') as string;
   const content = formData.get('content') as string;
+  const published = formData.get('published') === 'true';
 
   await fetch('http://api:3000/posts' , {
     method: 'POST',
     headers: { 'Content-Type': 'application/json'},
-    body: JSON.stringify({title, content})
+    body: JSON.stringify({title, content, published})
   })
   
   redirect('/')
@@ -24,17 +25,21 @@ export default function NewPostPage() {
       <label htmlFor="title" >タイトル</label>
       <input id="title"
              name="title"
-             className='bg-netural-900 border border-neutral-600 next-neutral-100 rounded px-3 py-2'
+             className='bg-neutral-900 border border-neutral-600 text-neutral-100 rounded px-3 py-2'
       />
     </div>
-
 
     <div className='flex flex-col gap-1'>
     <label htmlFor="content" >本文</label>
     <textarea id="content" 
               name="content" 
-              className='bg-netural-900 border border-neutral-600 next-neutral-100 rounded px-3 py-2 min-h-32'
+              className='bg-neutral-900 border border-neutral-600 text-neutral-100 rounded px-3 py-2 min-h-32'
     />
+    </div>
+
+    <div className='flex items-center gap-2'>
+      <input type="checkbox" id="published" name="published" value="true" />
+      <label htmlFor="published">公開する</label>
     </div>
 
     <button type="submit"

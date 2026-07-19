@@ -37,7 +37,7 @@ export async function postRoutes(app: FastifyInstance) {
 
 
   // POST:データ登録
-  app.post<{ Body: { title: string, content: string} }>('/posts', {
+  app.post<{ Body: { title: string, content: string, published?: boolean } }>('/posts', {
     schema: {
       body: {
         type: 'object',
@@ -45,13 +45,14 @@ export async function postRoutes(app: FastifyInstance) {
         properties: {
           title: { type: 'string' },
           content: { type: 'string' },
+          published: { type: 'boolean' },
         }
       }
     }
   }, async(request, reply ) => {
-    const { title, content } = request.body;
+    const { title, content, published } = request.body;
 
-    return await prisma.post.create({ data: {title, content } });
+    return await prisma.post.create({ data: {title, content, published } });
   });
 
 
