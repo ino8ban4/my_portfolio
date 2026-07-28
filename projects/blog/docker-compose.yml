@@ -7,15 +7,26 @@ services:
       - ./api/.env
     volumes:
       - ./api:/workspace
+      # 2つの理由からnode_modulesをボリューム化する
+      # 1. コンテナ起動毎にモジュールインストールさせないようにモジュールを保持する理由
+      # 2. CI環境を含む初期構築での事象に影響を与えるため。
+      #    本来node_modulesはgitignoreに登録しているため初回実行前は空ディレクトリである。そのため./apiディレクトリ配下の空のディレクトリがマウントされる。
+      #    初回起動時に(entrypoint.shが)コンテナ内でnode_modulesをインストールする
+      #    そこでnode_modulesだけを切り出したapi_node_modulesをボリュームマウントさせることで正しくnode_modulesを参照できるようにする
+      - api_node_modules:/workspace/node_modules
+      # 開発・保守用ボリューム
       - ~/dotfiles:/root/dotfiles
       - ~/.ssh/id_ed25519_dev.pub:/root/.ssh_keys/authorized_keys:ro
-      - api_node_modules:/workspace/node_modules
     ports:
       - "3000:3000"
       - "5555:5555"
       - "2222:22"
     stdin_open: true
     tty: true
+    # apiの起動チェックとしてhealthcheckを利用する。
+    # localhostではIPv6アドレス(::1)として解決されてしまい、
+    # IPv4(127.0.0.1)でしかlistenしていないapiに接続できずエラーになるため、
+    # 明示的にIPv4のループバックアドレスを指定する。
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/health"]
       interval: 5s
@@ -29,14 +40,23 @@ services:
       dockerfile: Dockerfile.dev
     volumes:
       - ./frontend:/workspace
+      # 2つの理由からnode_modulesをボリューム化する
+      # 1. コンテナ起動毎にモジュールインストールさせないようにモジュールを保持する理由
+      # 2. CI環境を含む初期構築での事象に影響を与えるため。
+      #    本来node_modulesはgitignoreに登録しているため初回実行前は空ディレクトリである。そのため./frontendディレクトリ配下の空のディレクトリがマウントされる。
+      #    初回起動時に(entrypoint.shが)コンテナ内でnode_modulesをインストールする
+      #    そこでnode_modulesだけを切り出したfrontend_node_modulesをボリュームマウントさせることで正しくnode_modulesを参照できるようにする
+      - frontend_node_modules:/workspace/node_modules
+      # 開発・保守用ボリューム
       - ~/dotfiles:/root/dotfiles
       - ~/.ssh/id_ed25519_dev.pub:/root/.ssh_keys/authorized_keys:ro
-      - frontend_node_modules:/workspace/node_modules
     ports:
       - "3001:3001"
       - "2223:22"
     stdin_open: true
     tty: true
+    # apiが起動しても応答できない状態でfetch処理が実行される可能性がある。
+    # その際、ECONNREFUSEDとなってしまい起動失敗してしまうため、api側の応答があり次第frontendのサービス起動を行う。
     depends_on:
       api:
         condition: service_healthy
