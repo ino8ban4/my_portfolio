@@ -1,5 +1,6 @@
 import  { FastifyInstance } from "fastify";
 import prisma from "../prisma";
+import { createPostSchema, deletePostSchema, getPostSchema, updatePostSchema } from "../schemas/post.schema";
 
 export async function postRoutes(app: FastifyInstance) {
   
@@ -11,15 +12,7 @@ export async function postRoutes(app: FastifyInstance) {
 
   // GET:1件取得
   app.get<{ Params: {id: string } }>('/posts/:id', {
-    schema: {
-      params: {
-        type: 'object',
-        required: ['id'],
-        properties: {
-          id: { type: 'string'}
-        }
-      }
-    }
+    schema: getPostSchema
   }, async(request, reply) => {
        const { id } = request.params;
 
@@ -38,17 +31,7 @@ export async function postRoutes(app: FastifyInstance) {
 
   // POST:データ登録
   app.post<{ Body: { title: string, content: string, published?: boolean } }>('/posts', {
-    schema: {
-      body: {
-        type: 'object',
-        required: ['title', 'content'],
-        properties: {
-          title: { type: 'string' },
-          content: { type: 'string' },
-          published: { type: 'boolean' },
-        }
-      }
-    }
+    schema: createPostSchema
   }, async(request, reply ) => {
     const { title, content, published } = request.body;
 
@@ -59,24 +42,7 @@ export async function postRoutes(app: FastifyInstance) {
   // PUT:データ更新
   app.put<{ Body: { title: string, content: string, published: boolean} , Params: { id: string } }>(
     '/posts/:id', {
-      schema: {
-        body: {
-          type: 'object',
-          required: ['title', 'content', 'published'],
-          properties: {
-            title: { type: 'string'},
-            content: { type: 'string'},
-            published: { type: 'boolean'},
-          }
-        },
-      params: {
-        type: 'object',
-        required: ['id'],
-        properties: {
-          id: { type: 'string'}
-        }
-      }
-    }
+      schema: updatePostSchema
   }, async( request ) => {
     const { title, content, published } = request.body;
     const { id } = request.params;
@@ -90,15 +56,7 @@ export async function postRoutes(app: FastifyInstance) {
 
   // DELETE:データ削除
   app.delete<{ Params: {id: string } }>('/posts/:id', {
-    schema: {
-      params: {
-        type: 'object',
-        required: ['id'],
-        properties: {
-          id: { type: 'string'}
-        }
-      }
-    }
+    schema: deletePostSchema
   }, async(request) => {
     const { id } = request.params;
 
