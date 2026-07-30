@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import { SubmitButton } from '../../components/SubmitButton'
 
 async function deletePost(id: string) {
   'use server'
@@ -36,12 +37,7 @@ export default async function PostPage({ params }: Props) {
       </Link>
 
       <form action={deletePostWithId}>
-      <button 
-        type="submit"
-        data-testid="delete-button"
-        className="bg-red-600 hover:bg-red-500 text-white rounded px-4 py-2 w-fit">
-      削除
-      </button>
+        <SubmitButton variant='danger' testId='delete-button'>削除</SubmitButton>
       </form>
       </div>
     </main>
