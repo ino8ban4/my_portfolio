@@ -21,5 +21,9 @@ RUN echo "alias ll='ls -la'" >> /root/.bashrc
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+
+COPY scripts/setup-ssh.sh /scripts/setup-ssh.sh
+RUN chmod +x /scripts/setup-ssh.sh
+
 CMD ["/entrypoint.sh"]
 
