@@ -1,0 +1,14 @@
+# クラスタ内部からのみアクセス可能なService(ClusterIP、デフォルト)。
+# apiのPodが「blog-postgres」という名前でこのDBに接続できるようにする(K8sの内部DNS機能)。
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: blog-postgres
+spec:
+  selector:
+    app: blog-postgres
+  ports:
+    - port: 5432
+      targetPort: 5432
+

@@ -1,0 +1,16 @@
+# PersistentVolumeClaim(PVC): アプリ側が「これだけのストレージが欲しい」と申告する要求書。
+# インフラの実装詳細(hostPathかEBSか等)を知らずに済むための抽象化レイヤー。
+# storage容量はCPU/メモリのresources.requestsと同じ「要求」の考え方。
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: blog-postgres-pvc
+spec: 
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: manual
+

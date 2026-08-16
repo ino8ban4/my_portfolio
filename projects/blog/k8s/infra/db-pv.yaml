@@ -1,0 +1,17 @@
+# PersistentVolume(PV): ストレージの「実体」を提供する側の定義。インフラ管理者が用意する。
+# PVC(要求書)とマッチングされ、Bound状態になると、そのPVCからしか使われなくなる(基本1:1)。
+# minikube環境ではhostPathを使うが、AWS移行時はEBS等に差し替える想定(PVCのYAMLは変更不要)。
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: blog-postgres-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/data/blog-postgres
+  storageClassName: manual
+
