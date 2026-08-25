@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: blog-api
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: blog-api
@@ -14,8 +14,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: blog-api:local
-          imagePullPolicy: Never
+          image: ghcr.io/ino8ban4/blog-api:latest
           ports:
             - containerPort: 3000
           envFrom:
