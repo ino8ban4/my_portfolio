@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: blog-api
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/ino8ban4/my_portfolio
+    targetRevision: main
+    path: projects/blog/k8s/app
+    directory:
+      recurse: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+
