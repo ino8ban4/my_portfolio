@@ -2,6 +2,7 @@
 # scripts/stop-cluster.sh
 set -e
 export AWS_PAGER=""
+export AWS_PROFILE=admin
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/.env"

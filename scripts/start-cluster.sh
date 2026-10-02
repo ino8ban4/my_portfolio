@@ -2,6 +2,7 @@
 # scripts/start-cluster.sh
 set -e
 export AWS_PAGER=""
+export AWS_PROFILE=admin
 
 # .envから変数を読み込む
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
