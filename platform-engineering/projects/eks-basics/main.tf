@@ -134,3 +134,40 @@ resource "aws_iam_role_policy_attachment" "node_ecr" {
   role       = aws_iam_role.node.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
+
+resource "aws_eks_cluster" "main" {
+  name     = "eks-basics"
+  role_arn = aws_iam_role.cluster.arn
+
+  vpc_config {
+    subnet_ids = [aws_subnet.public_1.id, aws_subnet.public_2.id]
+  }
+
+  access_config {
+    authentication_mode                         = "API_AND_CONFIG_MAP"
+    bootstrap_cluster_creator_admin_permissions = true
+  }
+
+  depends_on = [aws_iam_role_policy_attachment.cluster]
+}
+
+resource "aws_eks_node_group" "main" {
+  cluster_name    = aws_eks_cluster.main.name
+  node_group_name = "eks-basics"
+  node_role_arn   = aws_iam_role.node.arn
+  subnet_ids      = [aws_subnet.public_1.id, aws_subnet.public_2.id]
+  instance_types  = ["t3.medium"]
+  ami_type        = "AL2023_x86_64_STANDARD"
+
+  scaling_config {
+    desired_size = 2
+    min_size     = 1
+    max_size     = 2
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.node_worker,
+    aws_iam_role_policy_attachment.node_cni,
+    aws_iam_role_policy_attachment.node_ecr,
+  ]
+}
