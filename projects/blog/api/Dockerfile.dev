@@ -9,8 +9,10 @@ RUN apk add --no-cache \
     musl-dev \
     tmux \
     stow \
-    openssh
+    openssh \
+    opentofu
 
+RUN npm install -g prettier
 
 WORKDIR /workspace
 
