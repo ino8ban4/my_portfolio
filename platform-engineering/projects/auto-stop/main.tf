@@ -131,3 +131,33 @@ resource "aws_iam_role_policy" "lambda" {
   role   = aws_iam_role.lambda.id
   policy = data.aws_iam_policy_document.lambda_permissions.json
 }
+
+data "archive_file" "lambda" {
+  type        = "zip"
+  source_file = "${path.module}/lambda_function.py"
+  output_path = "${path.module}/lambda_function.zip"
+}
+
+resource "aws_lambda_function" "stop" {
+  function_name    = "auto-stop"
+  role             = aws_iam_role.lambda.arn
+  runtime          = "python3.12"
+  handler          = "lambda_function.handler"
+  filename         = data.archive_file.lambda.output_path
+  source_code_hash = data.archive_file.lambda.output_base64sha256
+  timeout          = 30
+}
+
+resource "aws_sns_topic_subscription" "lambda" {
+  topic_arn = aws_sns_topic.auto_stop.arn
+  protocol  = "lambda"
+  endpoint  = aws_lambda_function.stop.arn
+}
+
+resource "aws_lambda_permission" "sns" {
+  statement_id  = "AllowExecutionFromSNS"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.stop.function_name
+  principal     = "sns.amazonaws.com"
+  source_arn    = aws_sns_topic.auto_stop.arn
+}
