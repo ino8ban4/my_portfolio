@@ -8,6 +8,7 @@
 | 10/21 | EKSの準備: ネットワーク、IAM、クラスタ、ノードグループ | 初回40%、再テスト67%、記述は合格 | サブネットとAZ、IGW・ルートテーブル・関連付けの関係、validateの守備範囲 |
 | 11/3 | EKS検証: 構築、BlogAPI、名前解決、PV/PVC、破棄 | 選択式80% | 破棄の前にnamespaceを消す理由(Kubernetesが作ったAWSリソースはstateにない) |
 | 9月以前 | kubeadm(IPIP・SG)、CD(GHCR)、PV、Terraform基礎 | (別チャットの記録。要補完) | |
+| 11/23 | auto-stop: IAM(IDベース/リソースベース)、aws_lambda_permission、condition、(known after apply)、plan と apply | 初回20%、再テスト60%(未達。自作リソースの演習で定着させる) | aws_lambda_permission と実行ロールの区別。(known after apply)の境目(既存を読む data か、これから作る resource の参照か)。plan が通っても apply は失敗しうる |
 
 ## 関連する学習ログ
 - docs/learning-logs/2026-09.md、2026-10.md
