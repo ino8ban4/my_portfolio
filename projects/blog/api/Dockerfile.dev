@@ -16,9 +16,9 @@ RUN npm install -g prettier
 
 WORKDIR /workspace
 
-COPY package.json .
+COPY package.json package-lock.json ./
 
-RUN npm install
+RUN npm ci
 RUN echo "alias ll='ls -la'" >> /root/.bashrc
 
 COPY entrypoint.sh /entrypoint.sh
