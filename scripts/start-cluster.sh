@@ -8,7 +8,7 @@ export AWS_PROFILE=admin
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/.env"
 
-echo "Starting EC2 inst<D-b>ances..."
+echo "Starting EC2 instances..."
 aws ec2 start-instances --instance-ids "${CONTROL_PLANE_ID}" "${WORKER_ID}"
 
 echo "Waiting for instances to be running..."
