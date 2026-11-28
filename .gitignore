@@ -4,3 +4,7 @@ __pycache__/
 .DS_Store
 node_modules/
 .vscode/
+
+# k8s Secret(本物)は Git に入れない。雛形(*.example.yaml)だけ入れる
+projects/blog/k8s/secrets/*.yaml
+!projects/blog/k8s/secrets/*.example.yaml
